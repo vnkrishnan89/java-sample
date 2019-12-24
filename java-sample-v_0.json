@@ -1,9 +1,9 @@
 {
-    "family": "java-sample",
+    "family": "javasample",
     "containerDefinitions": [
         {
             "image": "743550917294.dkr.ecr.us-east-1.amazonaws.com/javasample:latest",
-            "name": "java-sample",
+            "name": "javasample",
             "cpu": 10,
             "memory": 256,
             "essential": true,
