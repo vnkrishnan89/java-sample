@@ -1,0 +1,18 @@
+{
+    "family": "java-sample",
+    "containerDefinitions": [
+        {
+            "image": "743550917294.dkr.ecr.us-east-1.amazonaws.com/javasample:latest",
+            "name": "java-sample",
+            "cpu": 10,
+            "memory": 256,
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 8080,
+                    "hostPort": 1234
+                }
+            ]
+        }
+    ]
+}
