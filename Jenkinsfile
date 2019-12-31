@@ -42,7 +42,7 @@ pipeline{
                 withAWS(credentials: 'aws', region: 'us-east-1') {
 		    //sh "sed -i 's/\"hostPort\".*/\"hostPort\": ${params.port}/g' javasample-v_0.json"
                     sh "aws ecs register-task-definition --cli-input-json file://javasample-v_0.json"
-		    sh "aws ecs update-service --cluster javasample --service javasample-service --task-definition javasample --desired-count 1"
+		    sh "aws ecs create-service --cluster javasample --service-name javasample-service --task-definition javasample --desired-count 1"
                     sh "eval sudo \$(aws ecr get-login --no-include-email | sed 's|https://||')"
                     sh "sudo docker run -d -p ${params.port}:8080 743550917294.dkr.ecr.us-east-1.amazonaws.com/javasample:latest"
                 }                    
