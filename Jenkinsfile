@@ -1,7 +1,8 @@
 pipeline{
     agent any
   parameters{
-    string(name: 'port', defaultValue: '1234')        
+    string(name: 'port', defaultValue: '1234')   
+    string(name: 'text', defaultValue: 'Krishnan')
   }
     stages{
         stage('checkout'){
@@ -11,7 +12,7 @@ pipeline{
         }
         stage('build'){
             steps{
-		sh "sed -i 's/Hello World!/Hello Krishnan/g' src/main/webapp/index.jsp"
+		sh "sed -i 's/Hello.*$/Hello ${params.text}/g' src/main/webapp/index.jsp"
                 sh "mvn clean package"
             }
         } 
