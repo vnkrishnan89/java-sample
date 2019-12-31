@@ -11,6 +11,7 @@ pipeline{
         }
         stage('build'){
             steps{
+		sh "sed -i 's/Hello World!/Hello Krishnan/g' src/main/webapp/index.jsp"
                 sh "mvn clean package"
             }
         } 
