@@ -12,7 +12,7 @@ pipeline{
         }
         stage('build'){
             steps{
-		sh "sed -i 's/Hello.*/Hello \${params.text}/g' src/main/webapp/index.jsp"
+		sh "sed -i 's/Hello.*/Hello ${params.text}/g' src/main/webapp/index.jsp"
                 sh "mvn clean package"
             }
         } 
