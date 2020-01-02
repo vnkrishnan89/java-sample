@@ -23,3 +23,10 @@ Resources:
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [1, !GetAZs '']
       CidrBlock: !Sub '10.0.32.0/20'
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+
+  VpcGatewayAttachment:
+    Type: 'AWS::EC2::VpcGatewayAttachment'
+    InternetGatewayId: !Ref InternetGateway
+    VpcId: !Ref VPC
