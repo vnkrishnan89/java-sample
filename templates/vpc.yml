@@ -45,5 +45,12 @@ Resources:
     Properties:
       RouteTableId: !Ref RouteTable
       SubnetId: !Ref Subnet2
+  InternetRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
       
      
