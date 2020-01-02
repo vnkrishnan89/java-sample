@@ -52,5 +52,20 @@ Resources:
       GatewayId: !Ref InternetGateway
       RouteTableId: !Ref RouteTable
       DestinationCidrBlock: '0.0.0.0/0'
-      
+Outputs:
+  VPC:
+    Description: VPC
+    Value: !Ref VPC
+    Export:
+      Name: 'VPC'
+  Subnet1:
+    Description: Subnet 1 on AZ 1
+    Value: !Ref Subnet1
+    Export:
+      Name: 'Subnet1'
+  Subnet2:
+    Description: Subnet 2 on AZ 2
+    Value: !Ref Subnet2
+    Export:
+      Name: 'Subnet2'
      
