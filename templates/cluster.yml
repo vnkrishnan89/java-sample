@@ -13,7 +13,8 @@ Resources:
       Subnets:
         - !ImportValue 'Subnet1'
         - !ImportValue 'Subnet2'
-      SecurityGroups: !Ref 'LoadBalancerSecurityGroup'
+      SecurityGroups: 
+        - !Ref 'LoadBalancerSecurityGroup'
   LoadBalancerSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
