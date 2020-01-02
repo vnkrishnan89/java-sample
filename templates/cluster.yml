@@ -6,3 +6,20 @@ Resources:
     Type: 'AWS::ECS::Cluster'
     Properties:
       ClusterName: 'java-sample-CF'
+  LoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingv2::LoadBalancer'
+    Properties:
+      Name: java-sample-load-balancer
+      Subnets:
+        - !ImportValue 'Subnet1'
+        - !ImportValue 'Subnet2'
+      SecurityGroups: !Ref 'LoadBalancerSecurityGroup'
+  LoadBalancerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: security group for loadbalancer to services on ECS
+      VpcId: !ImportValue 'VPC'
+      SecurityGroupIngress:
+        - CidrIp: '0.0.0.0/0'
+          IpProtocol: -1
+    
