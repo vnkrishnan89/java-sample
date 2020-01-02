@@ -1,0 +1,8 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: for container cluster on ECS, loadbalancer, Security group and cloudwatch
+
+Reources:
+  ECSCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: 'java-sample-CF'

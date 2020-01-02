@@ -43,6 +43,7 @@ pipeline{
 		    //sh "sed -i 's/\"hostPort\".*/\"hostPort\": ${params.port}/g' javasample-v_0.json"
 		    //sh "aws cloudformation update-stack --stack-name javasample --no-fail-on-empty-changeset --template-body file://templates/vpc.yml"
 		    sh "aws cloudformation deploy --stack-name javasample --template-file templates/vpc.yml --no-fail-on-empty-changeset"
+		    sh "aws cloudformation deploy --stack-name java-sample --template-file templates/cluster.yml --no-fail-on-empty-changeset"
            //         sh "aws ecs register-task-definition --cli-input-json file://javasample-v_0.json"
 		   // sh "aws ecs update-service --cluster javasample --service javasample-service --task-definition javasample --desired-count 1"
            //         sh "eval sudo \$(aws ecr get-login --no-include-email | sed 's|https://||')"
