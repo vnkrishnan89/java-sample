@@ -9,4 +9,10 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       InstanceTenancy: default
-
+  Subnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIponLaunch: true
+      CidrBlock: !Sub '10.0.32.0/20'
