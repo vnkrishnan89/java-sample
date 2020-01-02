@@ -7,7 +7,7 @@ Resources:
     Properties:
       ClusterName: 'java-sample-CF'
   LoadBalancer:
-    Type: 'AWS::ElasticLoadBalancingv2::LoadBalancer'
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
       Name: java-sample-load-balancer
       Subnets:
