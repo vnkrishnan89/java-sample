@@ -28,5 +28,5 @@ Resources:
 
   VPCGatewayAttachment:
     Type: 'AWS::EC2::VPCGatewayAttachment'
-      InternetGatewayId: !Ref InternetGateway
-      VpcId: !Ref VPC
+    InternetGatewayId: !Ref InternetGateway
+    VpcId: !Ref VPC
