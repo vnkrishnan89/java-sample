@@ -8,8 +8,6 @@ Resources:
       Cpu: 256
       Memory: 512
       NetworkMode: awsvpc
-      RequiredCompatibilities:
-        - EC2
       ExecutionRoleArn: !ImportValue 'ECSTaskExecutionRole'
       ContainerDefinitions:
         - Name: javasample
