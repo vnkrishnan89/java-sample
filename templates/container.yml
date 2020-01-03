@@ -25,3 +25,30 @@ Resources:
               awslogs-group: 'javasamplelogs'
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: 'javasample'
+  ListenerRule:
+    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'  
+    Properties:
+      ListenerArn: !ImportValue Listener
+      Priority: 2
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /
+      Actions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: Forward
+  TargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: javasample-tg
+      VpcId: !ImportValue VPC
+      Port: 80
+      Protocol: HTTP
+      Matcher:
+        HTTPcODE: 200-209
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThreasholdCount: 10
+      TargetType: ip
