@@ -24,3 +24,9 @@ Resources:
                   - 'ecr:CreateLogStream'
                   - 'ecr:PutLogEvents'
                 Resource: '*'
+Outputs:
+  ECSTaskExecutionRole:
+    Description: ECS Task Execution Role
+    Value: !GetAtt 'ECSTaskExecutionRole.Arn'
+    Export:
+      Name: 'ECSTaskExecutionRole'                

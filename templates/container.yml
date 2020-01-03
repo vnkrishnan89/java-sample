@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: container on ECS
+Resources:
+  Task:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      Family: javasample
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      RequiredCompatibilities:
+        - EC2
+      ExecutionRoleArn: !ImportValue 'ECSTaskExecutionRole'
+      ContainerDefinitions:
+        - Name: javasample
+          Image: 743550917294.dkr.ecr.us-east-1.amazonaws.com/javasample:latest
+          Cpu: 256
+          Memory: 512
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: 'javasamplelogs'
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'javasample'

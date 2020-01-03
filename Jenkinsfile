@@ -48,6 +48,8 @@ pipeline{
                     sh "aws cloudformation describe-stack-events --stack-name javasample-cluster"
                     sh "aws cloudformation deploy --stack-name javasample-role --template-file templates/role.yml --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM"
                     sh "aws cloudformation describe-stack-events --stack-name  javasample-role"
+                    sh "aws cloudformation deploy --template-file templates/container.yml --stack-name javasample-container --no-fail-on-empty-changeset"
+                    sh "aws cloudformation describe-stack-events --stack-name javasample-container"
            //         sh "aws ecs register-task-definition --cli-input-json file://javasample-v_0.json"
 		   // sh "aws ecs update-service --cluster javasample --service javasample-service --task-definition javasample --desired-count 1"
            //         sh "eval sudo \$(aws ecr get-login --no-include-email | sed 's|https://||')"
