@@ -50,5 +50,5 @@ Resources:
       HealthCheckPath: /
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
-      HealthyThreasholdCount: 10
+      HealthyThresholdCount: 10
       TargetType: ip
