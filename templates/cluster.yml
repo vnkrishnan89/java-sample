@@ -30,3 +30,12 @@ Resources:
       VpcId: !ImportValue 'VPC'
       Protocol: 'HTTP'
       Port: 80
+  LoadBalancerListener:
+    Type: 'AWS::ElasticLoadbalancingV2::Listener'
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Protocol: 'HTTP'
+      Port: 80
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref DefaultTargetGroup
