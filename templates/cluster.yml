@@ -36,6 +36,6 @@ Resources:
       LoadBalancerArn: !Ref LoadBalancer
       Protocol: 'HTTP'
       Port: 80
-      Actions:
+      DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref DefaultTargetGroup
