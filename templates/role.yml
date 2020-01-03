@@ -10,17 +10,17 @@ Resources:
             Principal:
               Service: [ecs-tasks.amazonaws.com]
             Action: [sts-AssumeRole']
-    Path: /
-    Policies:
-      - PolicyName: AmazonECSTaskExecutionRolePolicy
-        PolicyDocument:
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'ecr:GetAuthorizationToken'
-                - 'ecr:BatchCheckLayerAvailability'
-                - 'ecr:GetDownloadUrlForLayer'
-                - 'ecr:BatchGetImage'
-                - 'ecr:CreateLogStream'
-                - 'ecr:PutLogEvents'
-              Resource: '*'
+      Path: /
+      Policies:
+        - PolicyName: AmazonECSTaskExecutionRolePolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ecr:GetAuthorizationToken'
+                  - 'ecr:BatchCheckLayerAvailability'
+                  - 'ecr:GetDownloadUrlForLayer'
+                  - 'ecr:BatchGetImage'
+                  - 'ecr:CreateLogStream'
+                  - 'ecr:PutLogEvents'
+                Resource: '*'
