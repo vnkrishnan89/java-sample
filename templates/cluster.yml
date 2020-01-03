@@ -39,3 +39,17 @@ Resources:
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref DefaultTargetGroup
+  CloudWatchLogsGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: 'javasamplelogs'
+      RetentionInDays: 1
+  ContainerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: For container on ECS
+      VpcId: !ImportValue 'VPC'
+      SecurityGroupIngress:
+        SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+        IpProtocol: -1
+
