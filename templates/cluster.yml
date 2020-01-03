@@ -31,7 +31,7 @@ Resources:
       Protocol: 'HTTP'
       Port: 80
   LoadBalancerListener:
-    Type: 'AWS::ElasticLoadbalancingV2::Listener'
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
       LoadBalancerArn: !Ref LoadBalancer
       Protocol: 'HTTP'
