@@ -66,7 +66,6 @@ Resources:
         MinimumHealthyPercent: 70
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
           Subnets:
             - !ImportValue Subnet1
             - !ImportValue Subnet2
