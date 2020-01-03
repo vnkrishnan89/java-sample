@@ -52,3 +52,35 @@ Resources:
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 10
       TargetType: ip
+  Service:
+    Type: 'AWS::ECS::Service'
+    DependsOn: ListenerRule
+    Properties:
+      ServiceName: javasample-service
+      TaskDefinition: !Ref Task
+      Cluster: !ImportValue 'ECSCluster'
+      LaunchType: EC2
+      DesiredCount: 2
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 70
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Assign PublicIp: ENABLED
+          Subnets:
+            - !ImportValue Subnet1
+            - !ImportValue Subnet2
+          SecurityGroups:
+            - !ImportValue ContainerSecurityGroup
+      LoadBalancers:
+        - ContainerName: javasample
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup
+Outputs:
+  Endpoint:
+    Description: javasample endpoint
+    Value: !Join ['',['http://', !ImportValue DomainName, 'webappRunnerSample']]
+    Export:
+      Name: 'JavaSampleEndpoint'
+
+
