@@ -52,4 +52,25 @@ Resources:
       SecurityGroupIngress:
         SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
         IpProtocol: -1
+Outputs:
+  Cluster:
+    Value: !Ref ECSCluster
+    Description: ECS Cluster
+    Export:
+      Name: 'ECSCluster'
+  Listener:
+    Value: !Ref LoadBalancerListener
+    Description: listener port 80
+    Export:
+      Name: 'Listener'
+  ContainerSecurityGroup:
+    Value: !Ref ContainerSecurityGroup
+    Description: container security group
+    Export:
+      Name: 'ContainerSecurityGroup'
+  LoadBalancerDns:
+    Value: !GetAtt LoadBalancer.DNSName
+    Description: Domain name for the load balancer
+    Export:
+      Name: 'LoadBalancerDns'
 
