@@ -46,7 +46,7 @@ pipeline{
                     sh "aws cloudformation describe-stack-events --stack-name javasample-vpc"
 		    sh "aws cloudformation deploy --stack-name javasample-cluster --template-file templates/cluster.yml --no-fail-on-empty-changeset"
                     sh "aws cloudformation describe-stack-events --stack-name javasample-cluster"
-                    sh "aws cloudformation deploy --stack-name javasample-role --template-file templates/role.yml --no-fail-on-empty-changeset"
+                    sh "aws cloudformation deploy --stack-name javasample-role --template-file templates/role.yml --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM"
                     sh "aws cloudformation describe-stack-events --stack-name  javasample-role"
            //         sh "aws ecs register-task-definition --cli-input-json file://javasample-v_0.json"
 		   // sh "aws ecs update-service --cluster javasample --service javasample-service --task-definition javasample --desired-count 1"
