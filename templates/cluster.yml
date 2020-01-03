@@ -23,4 +23,10 @@ Resources:
       SecurityGroupIngress:
         - CidrIp: '0.0.0.0/0'
           IpProtocol: -1
-    
+  DefaultTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'    
+    Properties:
+      Name: Default
+      VpcId: !ImportValue 'VPC'
+      Protocol: 'HTTP'
+      Port: 80
