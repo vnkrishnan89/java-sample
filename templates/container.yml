@@ -79,7 +79,7 @@ Resources:
 Outputs:
   Endpoint:
     Description: javasample endpoint
-    Value: !Join ['',['http://', !ImportValue DomainName, 'webappRunnerSample']]
+    Value: !Join ['',['http://', !ImportValue LoadBalancerDns, 'webappRunnerSample']]
     Export:
       Name: 'JavaSampleEndpoint'
 
