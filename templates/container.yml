@@ -9,7 +9,7 @@ Resources:
       Memory: 512
       NetworkMode: awsvpc
       RequiresCompatibilities:
-        - EC2
+        - FARGATE
       ExecutionRoleArn: !ImportValue 'ECSTaskExecutionRole'
       ContainerDefinitions:
         - Name: javasample
@@ -59,7 +59,7 @@ Resources:
       ServiceName: javasample-service
       TaskDefinition: !Ref Task
       Cluster: !ImportValue 'ECSCluster'
-      LaunchType: EC2
+      LaunchType: FARGATE
       DesiredCount: 2
       DeploymentConfiguration:
         MaximumPercent: 200
