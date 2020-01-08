@@ -1,0 +1,238 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Javasample application runs in container on an EC2 instance which is launched in apublic subnet inside a VPC
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsHostnames: true
+      EnableDnsSupport: true      
+      CidrBlock: '10.0.0.0/16'
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+  PublicSubnetOne:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref 'VPC'
+      AvailabilityZone: !Select [0, !GetAZs '' ]
+      CidrBlock: '10.0.0.0/20'
+      MapPublicIpOnLaunch: true
+  PublicSubnetTwo:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref 'VPC'
+      AvailabilityZone: !Select [1, !GetAZs '' ]
+      CidrBlock: '10.0.32.0/20'
+      MapPublicIpOnLaunch: true
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'    
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+  SubnetOneAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref 'PublicSubnetOne'
+      RouteTableId: !Ref 'PublicRouteTable'
+  SubnetTwoAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref 'PublicSubnetTwo'
+      RouteTableId: !Ref 'PublicRouteTable'
+  EcsContainerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+        GroupDescription: Security Group for the EC2 container hosts
+        VpcId: !Ref 'VPC'
+  EcsContainerSecurityGroupIngressFromSelf:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: From self
+      IpProtocol: -1
+      GroupId: !Ref 'EcsContainerSecurityGroup'
+      SourceSecurityGroupId: !Ref 'EcsContainerSecurityGroup'        
+  EcsContainerSecurityGroupIngressFromALB:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: From ALB
+      IpProtocol: -1
+      GroupId: !Ref 'EcsContainerSecurityGroup'
+      SourceSecurityGroupId: !Ref 'ALBSecurityGroup'
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+        GroupDescription: Security Group for the ALB
+        VpcId: !Ref 'VPC'
+        SecurityGroupIngress:
+          IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: !Ref 'ContainerLaunchConfiguration'
+      VPCZoneIdentifier:
+        - !Ref 'PublicSubnetOne'
+        - !Ref 'PublicSubnetTwo'
+      MinSize: '1'
+      MaxSize: '2'
+      DesiredCapacity: '1'
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillUpdate: 'true' 
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT15M
+  ContainerLaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-00afc256a955c31b5
+      IamInstanceProfile: !Ref 'EC2Profile'    
+      SecurityGroups: 
+        - !Ref 'EcsContainerSecurityGroup'
+      InstanceType: 't2.micro'      
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+          yum install -y aws-cfn-bootstrap
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}              
+  PublicLoadBlancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Subnets:
+        - !Ref 'PublicSubnetOne'
+        - !Ref 'PublicSubnetTwo'
+      SecurityGroups:
+        - !Ref 'ALBSecurityGroup'
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: '30'    
+  DefaultTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref 'VPC'
+      Port: 80
+      Protocol: HTTP
+      HealthCheckIntervalSeconds: 6
+      HealthCheckTimeoutSeconds: 5
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      Name: !Join ['-', [ !Ref 'AWS::StackName', 'drop-1']]
+  PublicLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn: 
+      - PublicLoadBlancer
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - TargetGroupArn: !Ref 'DefaultTargetGroup'
+          Type: 'forward'
+      LoadBalancerArn: !Ref 'PublicLoadBlancer'   
+  AutoscalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [application-autoscaling.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: service-autoscaling
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+              - 'application-autoscaling:*'
+              - 'cloudwatch:DescribeAlarms'
+              - 'cloudwatch:PutMetricAlarm'
+              - 'ecs:DescribeServices'
+              - 'ecs:UpdateService'
+            Resource: '*'
+  EC2Profile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: 
+        - !Ref 'EC2Role'
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ec2.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: ecs-service
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+              - 'ecs:CreateCluster'
+              - 'ecs:DeregisterContainerInstance'
+              - 'ecs:DiscoverPollEndpoint'
+              - 'ecs:Poll'
+              - 'ecs:RegisterContainerInstance'
+              - 'ecs:StartTelemetrySession'
+              - 'ecs:Submit*'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+              - 'ecr:GetAuthorizationToken'
+              - 'ecr:BatchGetImage'
+              - 'ecr:GetDownloadUrlForLayer'
+            Resource: '*'
+  ECSRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ecs.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: ecs-service
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+              # Rules which allow ECS to attach network interfaces to instances
+              # on your behalf in order for awsvpc networking mode to work right
+              - 'ec2:AttachNetworkInterface'
+              - 'ec2:CreateNetworkInterface'
+              - 'ec2:CreateNetworkInterfacePermission'
+              - 'ec2:DeleteNetworkInterface'
+              - 'ec2:DeleteNetworkInterfacePermission'
+              - 'ec2:Describe*'
+              - 'ec2:DetachNetworkInterface'
+
+              # Rules which allow ECS to update load balancers on your behalf
+              # with the information sabout how to send traffic to your containers
+              - 'elasticloadbalancing:DeregisterInstancesFromLoadBalancer'
+              - 'elasticloadbalancing:DeregisterTargets'
+              - 'elasticloadbalancing:Describe*'
+              - 'elasticloadbalancing:RegisterInstancesWithLoadBalancer'
+              - 'elasticloadbalancing:RegisterTargets'
+            Resource: '*'
