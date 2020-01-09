@@ -28,7 +28,7 @@ Resources:
       Name: 'Java-Sample-Service'
       Port: 80
       Protocol: HTTP
-      VpcId: 'vpc-0eda0066ae35bcd5a'
+      VpcId: !ImportValue 'VPC'
   ListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
@@ -39,13 +39,13 @@ Resources:
         - Field: path-pattern
           Values: 
             - '*'
-      ListenerArn: 'arn:aws:elasticloadbalancing:us-east-1:743550917294:listener/app/javas-Publi-1LXVH3CUDSU1B/75e6bd1a76e6fcf5/25f5a2a33e867a96'
+      ListenerArn: !ImportValue 'Listener'
       Priority: 1      
   Service:
     Type: AWS::ECS::Service
     DependsOn: ListenerRule
     Properties:
-      Cluster: 'arn:aws:ecs:us-east-1:743550917294:cluster/javasample-cluster-ECSCluster-FP774MMQ5DW'
+      Cluster: !ImportValue 'Cluster'
       ServiceName: 'JavaSample-Service'
       DeploymentConfiguration:
         MaximumPercent: 200

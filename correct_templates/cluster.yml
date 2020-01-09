@@ -57,6 +57,9 @@ Resources:
     Properties:
         GroupDescription: Security Group for the EC2 container hosts
         VpcId: !Ref 'VPC'
+        SecurityGroupIngress:
+          - IpProtocol: -1
+            CidrIp: 0.0.0.0/0
   EcsContainerSecurityGroupIngressFromSelf:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -87,11 +90,8 @@ Resources:
         - !Ref 'PublicSubnetOne'
         - !Ref 'PublicSubnetTwo'
       MinSize: '1'
-      MaxSize: '2'
-      DesiredCapacity: '1'
-    UpdatePolicy:
-      AutoScalingReplacingUpdate:
-        WillUpdate: 'true' 
+      MaxSize: '3'
+      DesiredCapacity: '2'
     CreationPolicy:
       ResourceSignal:
         Timeout: PT15M
@@ -236,3 +236,21 @@ Resources:
               - 'elasticloadbalancing:RegisterInstancesWithLoadBalancer'
               - 'elasticloadbalancing:RegisterTargets'
             Resource: '*'
+Outputs:
+  Cluster:
+    Value: !Ref ECSCluster
+    Description: Arn for the cluster created
+    Export:
+      Name: 'Cluster'
+  Listener:
+    Value: !Ref PublicLoadBalancerListener
+    Description: Arn for the listener created
+    Export:
+      Name: 'Listener'
+  VPC:
+    Value: !Ref VPC 
+    Description: Arn for the VPC created
+    Export:
+      Name: 'VPC'
+      
+
